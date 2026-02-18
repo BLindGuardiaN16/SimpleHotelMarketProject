@@ -1,0 +1,39 @@
+
+<h2>Sales</h2>
+
+<h3>Categories</h3>
+<ul>
+    <li style="cursor:pointer;" (click)="selectCategory(null)">
+        All
+    </li>
+
+    <li
+    *ngFor="let c of (categories$ | async)"
+    style="cursor:pointer;"
+    (click)="selectCategory(c.id)">
+        {{c.name}}
+    </li>
+</ul>
+
+<h3>Products</h3>
+<ul>
+    <li *ngFor="let p of (filteredProducts$ | async)"     
+    >
+        {{p.name}} - {{p.unitPrice}} (Stock: {{p.stockQuantity}})
+        <button type="button" (click)="addToCart(p)" [disabled]="p.stockQuantity<=0">Ekle</button>
+    </li>
+</ul>
+
+<h3>Cart</h3>
+<ul>
+    <li *ngFor="let item of cart">
+             {{ item.name }}
+  <button type="button" (click)="decrease(item)">-</button>
+  <span> {{ item.quantity }} </span>
+  <button type="button" (click)="increase(item)">+</button>
+  = {{ item.unitPrice * item.quantity }}
+  <button type="button" (click)="remove(item)">x</button>
+</li>
+</ul>
+
+<p><strong>Total:</strong> {{ cartTotal || 0 }}</p>
