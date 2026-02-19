@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AsyncPipe, NgFor } from '@angular/common';
 import { BehaviorSubject, combineLatest, map, Observable, startWith } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 type Category = {
   id: number;
@@ -30,7 +31,7 @@ type CartItem = {
 @Component({
   selector: 'app-sales',
   standalone: true,
-  imports: [NgFor, AsyncPipe],
+  imports: [NgFor, AsyncPipe, FormsModule],
   templateUrl: './sales.html',
 })
 export class Sales {
@@ -50,19 +51,52 @@ export class Sales {
     this.products$ = this.http.get<Product[]>(`${this.apiBase}/products/active`);
 
     
-    this.filteredProducts$ = combineLatest([
-      this.products$,
-      this.selectedCategoryId$.pipe(startWith(null)),
-    ]).pipe(
-      map(([products, selectedId]) => {
-        if (selectedId == null) return products;
+      this.filteredProducts$ = combineLatest([this.products$,this.selectedCategoryId$.pipe(startWith(null)),])
+      .pipe(map(([products, selectedId]) => {if (selectedId == null) return products;
         return products.filter(p => p.categoryId === selectedId);
       })
     );
-    
+  }
+  roomNumber: string = '';
+  completeSale(): void {
+  if (!this.roomNumber.trim()) {
+    alert('Room number is required');
+    return;
   }
 
+  if (this.cart.length === 0) {
+    alert('Cart is empty');
+    return;
+  }
+
+  const payload = {
+    roomNumber: this.roomNumber,
+    items: this.cart.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity
+    }))
+  };
+
+  this.http.post(`${this.apiBase}/sales/room-charge`, payload)
+    .subscribe({
+      next: (res: any) => {
+        alert(`Sale completed. ID: ${res.saleId}`);
+
+        // Sepeti temizle
+        this.cart = [];
+        this.roomNumber = '';
+
+        window.location.reload();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Sale failed');
+      }
+    });
+}
+
   selectCategory(id: number | null): void {
+
     this.selectedCategoryIdSubject.next(id);
   }
 
@@ -93,8 +127,7 @@ export class Sales {
     });
   }
 increase(item: CartItem):void{
-  if(item.quantity >= item.maxStock){
-    alert('Üzgünüz, seçtiğiniz ürünün stoğu bitmiştir.')
+  if(item.quantity >= item.maxStock){alert('Üzgünüz, seçtiğiniz ürünün stoğu bitmiştir.')
     return;
   }
   item.quantity +=1;
