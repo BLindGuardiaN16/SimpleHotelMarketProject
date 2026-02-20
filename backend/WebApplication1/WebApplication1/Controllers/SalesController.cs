@@ -94,4 +94,48 @@ public class SalesController : ControllerBase
 
     }
 
+    [HttpGet]
+    public async Task<ActionResult<List<SaleListItemDto>>> GetAll()
+    {
+        var list = await _db.Sales
+              .AsNoTracking()
+              .OrderByDescending(s => s.CreatedAt)
+              .Select(s => new SaleListItemDto
+              {
+                  Id = s.Id,
+                  RoomNumber = s.RoomNumber,
+                  TotalAmount = s.TotalAmount,
+                  CreatedAt = s.CreatedAt
+              }).ToListAsync();
+       
+        return Ok(list);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<SaleDetailDto>> GetById(int id)
+    {
+        var sale = await _db.Sales
+            .AsNoTracking()
+            .Where(s => s.Id == id)
+            .Select(s => new SaleDetailDto
+            {
+                Id = s.Id,
+                RoomNumber = s.RoomNumber,
+                TotalAmount = s.TotalAmount,
+                CreatedAt = s.CreatedAt,
+                Items = s.Items.Select(i => new SaleDetailItemDto
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Product != null ? i.Product.Name : "",
+                    UnitPrice = i.UnitPrice,
+                    Quantity = i.Quantity,
+                    LineTotal = i.UnitPrice * i.Quantity
+                }).ToList()
+            }).FirstOrDefaultAsync();
+
+        if (sale == null) return NotFound();
+
+        return Ok(sale);
+    }
+
 }
