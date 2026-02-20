@@ -1,26 +1,85 @@
-<h2>Sales (Room Charges)</h2>
+<div class="container vstack">
 
-<ul>
-  <li *ngFor="let s of (sales$ | async)">
-    #{{ s.id }} | Room: {{ s.roomNumber }} | Total: {{ s.totalAmount }} | {{ s.createdAt }}
+  <!-- Header -->
+  <div class="hstack" style="justify-content:space-between;">
+    <div class="vstack" style="gap:4px;">
+      <h2 style="margin:0;">Room Charges (Sales)</h2>
+      <div class="muted">Listeden bir satış seçip detayını görebilirsin.</div>
+    </div>
+    <span class="badge">Admin</span>
+  </div>
 
-    <button type="button" (click)="loadSaleDetail(s.id)" style="margin-left:10px;">
-      Detay
-    </button>
-  </li>
-</ul>
+  <!-- Sales list -->
+  <div class="card vstack">
+    <div class="hstack" style="justify-content:space-between;">
+      <h3 style="margin:0;">Sales</h3>
+      <!-- İstersen ekle: TS’de reload() varsa aç -->
+      <!-- <button class="btn" type="button" (click)="reload()">Yenile</button> -->
+    </div>
 
-<div *ngIf="(selectedSale$ | async) as selectedSale">
-  <h3>Sale Detail</h3>
-  <p><strong>ID:</strong> {{ selectedSale.id }}</p>
-  <p><strong>Room:</strong> {{ selectedSale.roomNumber }}</p>
-  <p><strong>Total:</strong> {{ selectedSale.totalAmount }}</p>
-  <p><strong>Date:</strong> {{ selectedSale.createdAt }}</p>
+    <div *ngIf="(sales$ | async) as sales">
+      <div *ngIf="sales.length === 0" class="muted">Henüz satış yok.</div>
 
-  <h4>Items</h4>
-  <ul>
-    <li *ngFor="let i of selectedSale.items">
-      {{ i.productName }} | {{ i.quantity }} x {{ i.unitPrice }} = {{ i.lineTotal }}
-    </li>
-  </ul>
+      <div class="row" *ngFor="let s of sales">
+        <div class="vstack" style="gap:4px;">
+          <div>
+            <strong>#{{ s.id }}</strong>
+            <span class="muted"> • Room:</span> {{ s.roomNumber }}
+          </div>
+          <div class="muted">
+            {{ asUtc(s.createdAt) | date:'dd.MM.yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <div class="hstack">
+          <div class="badge">Total: {{ s.totalAmount }}</div>
+          <button class="btn btn-primary" type="button" (click)="loadSaleDetail(s.id)">
+            Detay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail -->
+  <div class="card vstack" *ngIf="(selectedSale$ | async) as selectedSale">
+    <div class="hstack" style="justify-content:space-between;">
+      <div class="vstack" style="gap:4px;">
+        <h3 style="margin:0;">Sale #{{ selectedSale.id }}</h3>
+        <div class="muted">
+          Room: {{ selectedSale.roomNumber }} •
+          {{ asUtc(selectedSale.createdAt) | date:'dd.MM.yyyy HH:mm' }}
+        </div>
+      </div>
+
+      <button class="btn" type="button" (click)="selectedSale$ = undefined">
+        Kapat
+      </button>
+    </div>
+
+    <div class="hstack" style="justify-content:space-between;">
+      <div class="muted">Total</div>
+      <div><strong>{{ selectedSale.totalAmount }}</strong></div>
+    </div>
+
+    <h4 style="margin:10px 0 0 0;">Items</h4>
+
+    <div *ngIf="!selectedSale.items || selectedSale.items.length === 0" class="muted">
+      Bu satışta item yok.
+    </div>
+
+    <div class="row" *ngFor="let i of selectedSale.items">
+      <div class="vstack" style="gap:4px;">
+        <div><strong>{{ i.productName }}</strong></div>
+        <div class="muted">
+          {{ i.quantity }} x {{ i.unitPrice }}
+        </div>
+      </div>
+
+      <div class="badge">
+        {{ i.lineTotal }}
+      </div>
+    </div>
+  </div>
+
 </div>

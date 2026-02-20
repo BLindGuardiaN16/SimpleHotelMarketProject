@@ -1,46 +1,82 @@
+<div class="container grid-2">
 
-<h2>Sales</h2>
+  <!-- SOL: categories + products -->
+  <div class="vstack">
+    <div class="card vstack">
+      <div class="hstack" style="justify-content:space-between;">
+        <h2 style="margin:0;">Categories</h2>
+        <span class="badge">Active</span>
+      </div>
 
-<h3>Categories</h3>
-<ul>
-    <li style="cursor:pointer;" (click)="selectCategory(null)">
-        All
-    </li>
-    <li
-    *ngFor="let c of (categories$ | async)"
-    style="cursor:pointer;"
-    (click)="selectCategory(c.id)">
-        {{c.name}}
-    </li>
-</ul>
+      <div class="hstack" style="flex-wrap:wrap;">
+        <button class="btn" type="button" (click)="selectCategory(null)">All</button>
 
-<h3>Products</h3>
-<ul>
-    <li *ngFor="let p of (filteredProducts$ | async)">
-        {{p.name}} - {{p.unitPrice}} (Stock: {{p.stockQuantity}})
-        <button type="button" (click)="addToCart(p)" [disabled]="p.stockQuantity<=0">Ekle</button>
-    </li>
-</ul>
+        <button class="btn" type="button"
+                *ngFor="let c of (categories$ | async)"
+                (click)="selectCategory(c.id)">
+          {{ c.name }}
+        </button>
+      </div>
+    </div>
 
-<h3>Cart</h3>
-<ul>
-    <li *ngFor="let item of cart">
-             {{ item.name }}
-  <button type="button" (click)="decrease(item)">-</button>
-  <span> {{ item.quantity }} </span>
-  <button type="button" (click)="increase(item)">+</button>
-  = {{ item.unitPrice * item.quantity }}
-  <button type="button" (click)="remove(item)">x</button>
-</li>
-</ul>
+    <div class="card vstack">
+      <h3 style="margin:0;">Products</h3>
 
-<h3>Complete Sale</h3>
-<input type="text" placeholder="Room Number" [(ngModel)]="roomNumber"
-/>
+      <div class="row" *ngFor="let p of (filteredProducts$ | async)">
+        <div class="vstack" style="gap:4px;">
+          <div><strong>{{ p.name }}</strong></div>
+          <div class="muted">
+            Stock: {{ p.stockQuantity }} • Price: {{ p.unitPrice }}
+          </div>
+        </div>
 
-<button type="button" (click)="completeSale()">
+        <button class="btn btn-primary" type="button" (click)="addToCart(p)">
+          Ekle
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAĞ: cart + room charge -->
+  <div class="vstack">
+    <div class="card vstack">
+      <h3 style="margin:0;">Cart</h3>
+
+      <div *ngIf="cart.length === 0" class="muted">Cart is empty.</div>
+
+      <div class="row" *ngFor="let item of cart">
+        <div class="vstack" style="gap:4px;">
+          <div><strong>{{ item.name }}</strong></div>
+          <div class="muted">{{ item.quantity }} x {{ item.unitPrice }}</div>
+        </div>
+
+        <div class="hstack">
+          <button class="btn" type="button" (click)="decrease(item)">-</button>
+          <span class="badge">{{ item.quantity }}</span>
+          <button class="btn" type="button" (click)="increase(item)">+</button>
+          <button class="btn btn-danger" type="button" (click)="remove(item)">x</button>
+        </div>
+      </div>
+
+      <div class="hstack" style="justify-content:space-between; margin-top:6px;">
+        <div class="muted">Total</div>
+        <div><strong>{{ cartTotal }}</strong></div>
+      </div>
+    </div>
+
+    <div class="card vstack">
+      <h3 style="margin:0;">Room Charge</h3>
+
+      <input class="input" type="text" placeholder="Room Number" [(ngModel)]="roomNumber" />
+
+      <button class="btn btn-primary" type="button" (click)="completeSale()">
         Complete Sale
-</button>
+      </button>
 
+      <div class="muted" style="font-size:12px;">
+        * Successful sale will refresh the page.
+      </div>
+    </div>
+  </div>
 
-<p><strong>Total:</strong> {{ cartTotal || 0 }}</p>
+</div>
