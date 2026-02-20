@@ -1,1 +1,26 @@
-<p>room-charges works!</p>
+<h2>Sales (Room Charges)</h2>
+
+<ul>
+  <li *ngFor="let s of (sales$ | async)">
+    #{{ s.id }} | Room: {{ s.roomNumber }} | Total: {{ s.totalAmount }} | {{ s.createdAt }}
+
+    <button type="button" (click)="loadSaleDetail(s.id)" style="margin-left:10px;">
+      Detay
+    </button>
+  </li>
+</ul>
+
+<div *ngIf="(selectedSale$ | async) as selectedSale">
+  <h3>Sale Detail</h3>
+  <p><strong>ID:</strong> {{ selectedSale.id }}</p>
+  <p><strong>Room:</strong> {{ selectedSale.roomNumber }}</p>
+  <p><strong>Total:</strong> {{ selectedSale.totalAmount }}</p>
+  <p><strong>Date:</strong> {{ selectedSale.createdAt }}</p>
+
+  <h4>Items</h4>
+  <ul>
+    <li *ngFor="let i of selectedSale.items">
+      {{ i.productName }} | {{ i.quantity }} x {{ i.unitPrice }} = {{ i.lineTotal }}
+    </li>
+  </ul>
+</div>
