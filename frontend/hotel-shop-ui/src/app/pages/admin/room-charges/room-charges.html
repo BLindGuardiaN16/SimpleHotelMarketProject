@@ -1,20 +1,18 @@
 <div class="container vstack">
 
-  <!-- Header -->
+  <!-- Başlık -->
   <div class="hstack" style="justify-content:space-between;">
     <div class="vstack" style="gap:4px;">
       <h2 style="margin:0;">Room Charges (Sales)</h2>
-      <div class="muted">Listeden bir satış seçip detayını görebilirsin.</div>
+      <div class="muted">Listeden bir satış seçip detayını görebilirsiniz.</div>
     </div>
     <span class="badge">Admin</span>
   </div>
 
-  <!-- Sales list -->
+  <!-- Sales listesi -->
   <div class="card vstack">
     <div class="hstack" style="justify-content:space-between;">
       <h3 style="margin:0;">Sales</h3>
-      <!-- İstersen ekle: TS’de reload() varsa aç -->
-      <!-- <button class="btn" type="button" (click)="reload()">Yenile</button> -->
     </div>
 
     <div *ngIf="(sales$ | async) as sales">
@@ -41,7 +39,7 @@
     </div>
   </div>
 
-  <!-- Detail -->
+  <!-- Detay kısmı -->
   <div class="card vstack" *ngIf="(selectedSale$ | async) as selectedSale">
     <div class="hstack" style="justify-content:space-between;">
       <div class="vstack" style="gap:4px;">

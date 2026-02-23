@@ -32,7 +32,6 @@ export class RoomCharges implements OnInit {
   }
   asUtc(value: any): any {
   if (typeof value === 'string') {
-    // Z yoksa UTC olarak işaretle
     if (!value.endsWith('Z')) return value + 'Z';
   }
   return value;
