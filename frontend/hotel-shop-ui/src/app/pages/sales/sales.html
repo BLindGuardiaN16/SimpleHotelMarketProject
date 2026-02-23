@@ -18,12 +18,14 @@
         </button>
       </div>
     </div>
+    
+    <input class="input" type="text" placeholder="Ürün Ara" (input)="onSearchInput($event)"/>
 
     <div class="card vstack">
       <h3 style="margin:0;">Products</h3>
 
       <div class="row" *ngFor="let p of (filteredProducts$ | async)">
-        <div class="vstack" style="gap:4px;">
+        <div class="vstack" style="gap:4px;"> 
           <div><strong>{{ p.name }}</strong></div>
           <div class="muted">
             Stock: {{ p.stockQuantity }} • Price: {{ p.unitPrice }}

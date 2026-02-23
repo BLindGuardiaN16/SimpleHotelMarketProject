@@ -44,6 +44,9 @@ export class Sales {
   private selectedCategoryIdSubject = new BehaviorSubject<number | null>(null);
   selectedCategoryId$ = this.selectedCategoryIdSubject.asObservable();
 
+  private searchTextSubject = new BehaviorSubject<string>('');
+  searchText$ = this.searchTextSubject.asObservable();
+
   cart: CartItem[] = [];
 
   constructor(private http: HttpClient) {
@@ -51,11 +54,28 @@ export class Sales {
     this.products$ = this.http.get<Product[]>(`${this.apiBase}/products/active`);
 
     
-      this.filteredProducts$ = combineLatest([this.products$,this.selectedCategoryId$.pipe(startWith(null)),])
-      .pipe(map(([products, selectedId]) => {if (selectedId == null) return products;
-        return products.filter(p => p.categoryId === selectedId);
-      })
-    );
+      this.filteredProducts$ = combineLatest([
+  this.products$,
+  this.selectedCategoryId$.pipe(startWith(null)),
+  this.searchText$.pipe(startWith('')),
+]).pipe(
+  map(([products, selectedId, search]) => {
+    let result = products;
+
+    
+    if (selectedId != null) {
+      result = result.filter(p => p.categoryId === selectedId);
+    }
+
+    
+    const q = (search ?? '').trim().toLowerCase();
+    if (q.length > 0) {
+      result = result.filter(p => p.name.toLowerCase().includes(q));
+    }
+
+    return result;
+  })
+);
   }
   roomNumber: string = '';
   completeSale(): void {
@@ -82,7 +102,6 @@ export class Sales {
       next: (res: any) => {
         alert(`Sale completed. ID: ${res.saleId}`);
 
-        // Sepeti temizle
         this.cart = [];
         this.roomNumber = '';
 
@@ -140,6 +159,10 @@ decrease(item:CartItem):void {
 }
 remove(item: CartItem):void{
   this.cart = this.cart.filter(x =>x.productId !== item.productId);
+}
+onSearchInput(event: Event): void { 
+  const input = event.target as HTMLInputElement;
+  this.searchTextSubject.next(input.value ?? '');
 }
 
   get cartTotal(): number {
